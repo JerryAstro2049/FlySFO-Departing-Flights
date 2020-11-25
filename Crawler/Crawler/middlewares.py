@@ -4,6 +4,8 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from scrapy.http import HtmlResponse
+from selenium import webdriver
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
@@ -78,7 +80,11 @@ class CrawlerDownloaderMiddleware:
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
-        return None
+        driver = webdriver.Chrome()
+        driver.get(request.url)
+        content = driver.page_source.encode('utf-8')
+        driver.quit()
+        return HtmlResponse(request.url, encoding='utf-8', body=content, request=request)
 
     def process_response(self, request, response, spider):
         # Called with the response returned from the downloader.
