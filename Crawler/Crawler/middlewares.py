@@ -63,6 +63,9 @@ class CrawlerDownloaderMiddleware:
     # scrapy acts as if the downloader middleware does not modify the
     # passed objects.
 
+    def __init__(self):
+        self.driver = webdriver.Chrome()
+
     @classmethod
     def from_crawler(cls, crawler):
         # This method is used by Scrapy to create your spiders.
@@ -80,11 +83,18 @@ class CrawlerDownloaderMiddleware:
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
-        driver = webdriver.Chrome()
-        driver.get(request.url)
-        content = driver.page_source.encode('utf-8')
-        # driver.quit()
-        return HtmlResponse(request.url, encoding='utf-8', body=content, request=request)
+        try:
+            current_page = request.meta['current_page']
+            print('current_page:\t' + str(current_page))
+            page_button_xpath = '//*[@id="flight_results_paginate"]/span/a[' + str(current_page) + ']'
+            self.driver.find_element_by_xpath(page_button_xpath).click()
+            content = self.driver.page_source.encode('utf-8')
+            # driver.quit()
+            return HtmlResponse(request.url, encoding='utf-8', body=content, request=request)
+        except KeyError:
+            self.driver.get(request.url)
+            pass
+        # I know this looks hacky, I'll find a better way to handle the spider's requests
 
     def process_response(self, request, response, spider):
         # Called with the response returned from the downloader.

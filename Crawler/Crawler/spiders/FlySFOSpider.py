@@ -6,15 +6,19 @@ from Crawler.items import FlightItem
 class FlySFOSpider(scrapy.Spider):
     name = 'FlySFO'
     allowed_domains = ['www.flysfo.com']
-    start_urls = ['https://www.flysfo.com/flight-info/flight-status/']
+    start_urls = ['https://www.flysfo.com/flight-info/flight-status']
+    url = 'https://www.flysfo.com/flight-info/flight-status'
 
     def request(self):
-        url = 'https://www.flysfo.com/flight-info/flight-status'
-        response = scrapy.Request(url, callback=self.parse)
-
+        response = scrapy.Request(self.url, callback=self.parse, dont_filter=True)
         yield response
 
     def parse(self, response):
+        for i in range(1, 4):
+            response = scrapy.Request(self.url, callback=self.get_flights, dont_filter=True, meta={'current_page': i})
+            yield response
+
+    def get_flights(self, response):
         filename = 'SFO today departs.html'
         with open(filename, 'wb') as f:
             f.write(response.body)
