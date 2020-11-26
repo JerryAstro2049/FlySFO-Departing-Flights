@@ -2,7 +2,7 @@ import scrapy
 
 
 class FlySFOSpider(scrapy.Spider):
-    name = 'FlySFOSpider'
+    name = 'FlySFO'
     allowed_domains = ['www.flysfo.com']
     start_urls = ['https://www.flysfo.com/flight-info/flight-status/']
 
@@ -12,6 +12,11 @@ class FlySFOSpider(scrapy.Spider):
         yield response
 
     def parse(self, response):
-        filename = "SFO today departs.html"
-        with open(filename, "wb") as f:
-            f.write(response.body)
+        flights = response.xpath('//*[@id="flight_results"]/tbody').get()
+
+        try:
+            filename = 'SFO today departs.html'
+            with open(filename, 'w', encoding='utf-8') as f:
+                f.write(flights)
+        except TypeError:
+            print('didn\'t get the flights')
