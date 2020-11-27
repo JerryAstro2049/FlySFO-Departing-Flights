@@ -19,6 +19,11 @@ class FlySFOSpider(scrapy.Spider):
         yield response
 
     def parse(self, response, **kwargs):
+        # just so we know we had the right page
+        filename = 'SFO today departs.html'
+        with open(filename, 'wb') as f:
+            f.write(response.body)
+
         total_flights_text = response.xpath('//*[@id="flight_results_info"]/text()').get()
         flights_number = int(re.findall(r'\d+', str(total_flights_text))[0])
         self.pages_number = flights_number // 15 if flights_number % 15 == 0 else flights_number // 15 + 1
@@ -29,10 +34,6 @@ class FlySFOSpider(scrapy.Spider):
             yield response
 
     def get_flights(self, response):
-        filename = 'SFO today departs.html'
-        with open(filename, 'wb') as f:
-            f.write(response.body)
-
         flights = response.xpath('//*[@id="flight_results"]/tbody/tr').getall()
         for flight in flights:
             flight_item = FlightItem()
