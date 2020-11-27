@@ -97,7 +97,8 @@ class CrawlerDownloaderMiddleware:
             return HtmlResponse(request.url, encoding='utf-8', body=content, request=request)
         except KeyError:
             self.driver.get(request.url)
-            pass
+            content = self.driver.page_source.encode('utf-8')
+            return HtmlResponse(request.url, encoding='utf-8', body=content, request=request)
         # I know this looks hacky, I'll find a better way to handle the spider's requests
 
     def process_response(self, request, response, spider):

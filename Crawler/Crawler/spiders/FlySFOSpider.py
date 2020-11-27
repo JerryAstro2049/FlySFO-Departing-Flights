@@ -1,6 +1,7 @@
 import scrapy
 
 from Crawler.items import FlightItem
+import re
 
 
 class FlySFOSpider(scrapy.Spider):
@@ -11,13 +12,18 @@ class FlySFOSpider(scrapy.Spider):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.pages_number = 3
+        self.pages_number = -1
 
     def request(self):
         response = scrapy.Request(self.url, callback=self.parse, dont_filter=True)
         yield response
 
     def parse(self, response, **kwargs):
+        total_flights_text = response.xpath('//*[@id="flight_results_info"]/text()').get()
+        flights_number = int(re.findall(r'\d+', str(total_flights_text))[0])
+        self.pages_number = flights_number // 15 if flights_number % 15 == 0 else flights_number // 15 + 1
+        print('there are ' + str(self.pages_number) + " pages")
+
         for i in range(self.pages_number):
             response = scrapy.Request(self.url, callback=self.get_flights, dont_filter=True, meta={'current_page': i})
             yield response
