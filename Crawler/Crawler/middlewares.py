@@ -65,6 +65,7 @@ class CrawlerDownloaderMiddleware:
 
     def __init__(self):
         self.driver = webdriver.Chrome()
+        self.getting_flights = False
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -86,8 +87,11 @@ class CrawlerDownloaderMiddleware:
         try:
             current_page = request.meta['current_page']
             print('current_page:\t' + str(current_page))
-            page_button_xpath = '//*[@id="flight_results_paginate"]/span/a[' + str(current_page) + ']'
-            self.driver.find_element_by_xpath(page_button_xpath).click()
+            if not self.getting_flights:
+                self.getting_flights = True
+            else:
+                page_button_xpath = '//*[@id="flight_results_next"]'
+                self.driver.find_element_by_xpath(page_button_xpath).click()
             content = self.driver.page_source.encode('utf-8')
             # driver.quit()
             return HtmlResponse(request.url, encoding='utf-8', body=content, request=request)

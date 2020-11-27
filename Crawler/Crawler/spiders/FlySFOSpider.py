@@ -9,12 +9,16 @@ class FlySFOSpider(scrapy.Spider):
     start_urls = ['https://www.flysfo.com/flight-info/flight-status']
     url = 'https://www.flysfo.com/flight-info/flight-status'
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.pages_number = 3
+
     def request(self):
         response = scrapy.Request(self.url, callback=self.parse, dont_filter=True)
         yield response
 
-    def parse(self, response):
-        for i in range(1, 4):
+    def parse(self, response, **kwargs):
+        for i in range(self.pages_number):
             response = scrapy.Request(self.url, callback=self.get_flights, dont_filter=True, meta={'current_page': i})
             yield response
 
@@ -24,11 +28,10 @@ class FlySFOSpider(scrapy.Spider):
             f.write(response.body)
 
         flights = response.xpath('//*[@id="flight_results"]/tbody/tr').getall()
-
         for flight in flights:
             flight_item = FlightItem()
-
             flight_obj = scrapy.Selector(text=flight)
+
             airline = "" if flight_obj.xpath('//td[1]/span[1]/text()').get() is None \
                 else flight_obj.xpath('//td[1]/span[1]/text()').get()
             departing_to = "" if flight_obj.xpath('//td[2]/text()').get() is None \
@@ -54,5 +57,4 @@ class FlySFOSpider(scrapy.Spider):
             flight_item['Remarks'] = remarks
             flight_item['Terminal'] = terminal
             flight_item['Gate'] = gate
-
             yield flight_item
