@@ -20,7 +20,7 @@ class FlySFOSpider(scrapy.Spider):
 
     def parse(self, response, **kwargs):
         # just so we know we had the right page
-        filename = 'SFO today departs.html'
+        filename = 'SFO Departing Flights.html'
         with open(filename, 'wb') as f:
             f.write(response.body)
 
