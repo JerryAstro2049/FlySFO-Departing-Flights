@@ -1,10 +1,12 @@
 # FlySFO Departing Flights
 
-So basically, this is a small `Scrapy` + `Selenium` + `ChromeDriver` project that gets San Francisco International Airport (SFO)'s departing flights from https://www.flysfo.com/
+So basically, this is a small `Scrapy` + `Selenium` + `ChromeDriver` project that gets San Francisco International Airport (SFO)'s departing flights from www.flysfo.com
 
 ## User Guide:
 
-The command below will activate the `Scrapy` framework and download all the flights:
+Use the command below to activate our spider and get the flights:
+
+under `FlySFO-Departing-Flights\Crawler`:
 
 `scrapy crawl FlySFO`
 
@@ -18,13 +20,13 @@ This is a recommendation, I think close versions are also fine though
 
 ### Scrapy
 
-The command below will take care of the installation `Scrapy`:
+Use the command below to install `Scrapy`:
 
 `pip install scrapy`
 
 ### Selenium
 
-The command below will take care of the installation `Selenium`:
+Use the command below to install `Selenium`:
 
 `pip install selenium`
 
